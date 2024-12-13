@@ -32,6 +32,9 @@ WORKDIR ${DEPLOY_DIR}
 # Just copying the jar file and renaming it to day17l
 COPY --from=compiler /code_folder/target/noticeboard-0.0.1-SNAPSHOT.jar noticeboard.jar
 
+# check if curl command is available
+RUN apt update && apt install -y curl
+
 ENV SERVER_PORT=3000
 EXPOSE ${SERVER_PORT}
 
