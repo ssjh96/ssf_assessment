@@ -2,7 +2,10 @@ package vttp.batch5.ssf.noticeboard.services;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -74,6 +77,12 @@ public class NoticeService {
 
 				respList.add("id: " + id);
 				respList.add("timestamp: " + timestamp);
+			
+				Map<String, Object> respMap = new HashMap<>();
+				respMap.put("id", id);
+				respMap.put("timestamp", timestamp);
+
+				noticeRepo.insertNotices(id, respMap);
 			}
 
 		} 

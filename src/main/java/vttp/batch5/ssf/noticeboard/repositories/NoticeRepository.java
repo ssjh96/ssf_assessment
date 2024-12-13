@@ -34,19 +34,19 @@ public class NoticeRepository {
 	 @Qualifier("notice")
 	 private RedisTemplate<String, Object> template;
 
-	public void insertNotices(String noticeId, Map<String, Object> respObj) {
+	// equivalent redis-cli command is (SET) e.g. SET key value
+	// in this case, SET, generated id, Stringified Json Resp Object
+	public void insertNotices(String noticeId, Map<String, Object> resp) {
 
-        JsonObject json = Json.createObjectBuilder()
-                .add("id", respObj.get("id").toString())
-                .add("timestamp", (long) respObj.get("timestamp"))
-                .build();
+        JsonObject jResp = Json.createObjectBuilder()
+			.add("id", resp.get("id").toString())
+			.add("timestamp", (long) resp.get("timestamp"))
+			.build();
 
-        // Save the JSON string into Redis
         ValueOperations<String, Object> valueOps = template.opsForValue();
-        valueOps.set(noticeId, json.toString());
+        valueOps.set(noticeId, jResp.toString());
 
-		// ValueOperations<String, Object> valueOps = template.opsForValue();
-			// valueOps.set(orderId, json.toString());
+		
 
 	}
 
