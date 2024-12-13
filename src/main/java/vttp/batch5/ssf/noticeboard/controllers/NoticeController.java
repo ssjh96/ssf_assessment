@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -49,7 +50,7 @@ public class NoticeController {
 
         System.out.println(respList.get(0));
         System.out.println(respList.get(1));
-        
+
         if(respList.get(0).startsWith("id"))
         {
             model.addAttribute("respId", respList.get(0));
@@ -63,5 +64,22 @@ public class NoticeController {
             return "error";
         }
     }
+
+    @GetMapping("/status")
+    public ResponseEntity<String> statusHealth() 
+    {
+        boolean healthy = true;
+
+        if (healthy)
+        {
+            return ResponseEntity.status(200).header("Content-Type", "application/json").body("{healthy}");
+        }
+        else
+        {
+            return ResponseEntity.status(503).header("Content-Type", "application/json").body("{notHealthy}");
+        }
+
+    }
+    
 
 }

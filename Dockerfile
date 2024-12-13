@@ -35,4 +35,8 @@ COPY --from=compiler /code_folder/target/noticeboard-0.0.1-SNAPSHOT.jar noticebo
 ENV SERVER_PORT=3000
 EXPOSE ${SERVER_PORT}
 
+# Delayed of 2 min before starting, health check every min
+HEALTHCHECK --interval=60s --timeout=30s --start-period=120s --retries=3 \
+   CMD curl http://localhost:${PORT}/status || exit 1
+
 ENTRYPOINT ["java", "-jar", "noticeboard.jar"]
