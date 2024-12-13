@@ -1,5 +1,6 @@
 package vttp.batch5.ssf.noticeboard.services;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import vttp.batch5.ssf.noticeboard.models.Notice;
 import vttp.batch5.ssf.noticeboard.repositories.NoticeRepository;
 
@@ -24,7 +26,7 @@ public class NoticeService {
 	// You can change the signature of this method by adding any number of parameters
 	// and return any type
 	
-	@Value("{${publishing.server.url}}")
+	@Value("${publishing.server.url}")
 	private String publishingServerUrl;
 
 	@Autowired
@@ -33,7 +35,7 @@ public class NoticeService {
 	public List<String> postToNoticeServer(Notice notice) 
 	{
 		String url = publishingServerUrl + "/notice";
-		System.out.println(url);
+		System.out.println("Url is >>> " + url);
 
 		List<String> respList = new ArrayList<>();
 		
@@ -64,13 +66,20 @@ public class NoticeService {
 
 			if (resp.getStatusCode().is2xxSuccessful())
 			{
-				respList.add(resp.getBody().toString());
+				JsonReader jReader = Json.createReader(new StringReader(resp.getBody()));
+				JsonObject jResp = jReader.readObject();
+
+				String id = jResp.getString("id");
+				long timestamp = jResp.getJsonNumber("timestamp").longValue();
+
+				respList.add("id: " + id);
+				respList.add("timestamp: " + timestamp);
 			}
 
 		} 
 		catch (Exception e) 
 		{
-			String error = e.getMessage();
+			String error = "Error: " + e.getMessage();
 			respList.add(error);
 		}
 

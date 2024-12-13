@@ -47,9 +47,10 @@ public class NoticeController {
        
         List<String> respList = noticeService.postToNoticeServer(notice);
 
+        System.out.println(respList.get(0));
         if(respList.get(0).startsWith("id"))
         {
-            model.addAttribute("noticeId", respList.get(0));
+            model.addAttribute("respId", respList.get(0));
 
             return "success";
         }
