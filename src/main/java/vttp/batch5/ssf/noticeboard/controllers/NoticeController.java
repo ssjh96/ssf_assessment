@@ -2,7 +2,10 @@ package vttp.batch5.ssf.noticeboard.controllers;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.validation.Valid;
 import vttp.batch5.ssf.noticeboard.models.Notice;
+import vttp.batch5.ssf.noticeboard.services.NoticeService;
 
 
 // Use this class to write your request handlers
 
 @Controller
 public class NoticeController {
+
+    @Autowired
+    private NoticeService noticeService;
 
     @GetMapping("/")
     public String showLandingPage(Model model) {
@@ -32,13 +39,26 @@ public class NoticeController {
     
 
     @PostMapping("/notice")
-    public String postNotice(@Valid @ModelAttribute ("notice") Notice notice, BindingResult result, Model model) {
+    public String postNotice(@Valid @ModelAttribute ("notice") Notice notice, BindingResult bindingResult, Model model) {
        
-        if (result.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             return "notice"; 
         }
        
-        return "redirect:/success"; 
+        List<String> respList = noticeService.postToNoticeServer(notice);
+
+        if(respList.get(0).startsWith("id"))
+        {
+            model.addAttribute("noticeId", respList.get(0));
+
+            return "success";
+        }
+        else
+        {
+            model.addAttribute("error", respList.get(0));
+
+            return "error";
+        }
     }
 
 }

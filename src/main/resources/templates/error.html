@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Success</title>
+    <title>Error</title>
 </head>
 <body>
-    <h3>Your message has been posted to the community message board</h3>
-    <p>The notice posting ID is <span data-th-text="${postedId}"></span></p>
+    <h2>Cannot post notice to Server</h2>
+    <h3>Error message:</h3>
+    <p data-th-text="${errorMessage}"></p>
     <a href="/">Back to Notice Board</a>
 </body>
 </html>

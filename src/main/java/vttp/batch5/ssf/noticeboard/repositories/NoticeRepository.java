@@ -2,16 +2,19 @@ package vttp.batch5.ssf.noticeboard.repositories;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Repository;
 
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import vttp.batch5.ssf.noticeboard.models.Notice;
 
+@Repository
 public class NoticeRepository {
 
 	// TODO: Task 4
@@ -27,33 +30,25 @@ public class NoticeRepository {
 	 *
 	 */
 
-	//  @Autowired
-	//  @Qualifier("notice")
-	//  private RedisTemplate<String, Object> template;
+	 @Autowired
+	 @Qualifier("notice")
+	 private RedisTemplate<String, Object> template;
 
-	// public void insertNotices(String noticeId, Notice notice) {
+	public void insertNotices(String noticeId, Map<String, Object> respObj) {
 
-	// 	JsonObject json = notice.toJson();
+        JsonObject json = Json.createObjectBuilder()
+                .add("id", respObj.get("id").toString())
+                .add("timestamp", (long) respObj.get("timestamp"))
+                .build();
 
-	// 	ValueOperations<String, Object> valueOps = template.opsForValue();
-	// 	valueOps.set(noticeId, json.toString());	
-	// }
+        // Save the JSON string into Redis
+        ValueOperations<String, Object> valueOps = template.opsForValue();
+        valueOps.set(noticeId, json.toString());
 
-	// private String serialiseNotice(Notice notice)
-	// {
+		// ValueOperations<String, Object> valueOps = template.opsForValue();
+			// valueOps.set(orderId, json.toString());
 
-	// 	// SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-	// 	// long epochPostDate = notice.getPostDate().getTime();
-
-	// 	// return Json.createObjectBuilder()
-    //     //         .add("title", notice.getTitle())
-    //     //         .add("poster", notice.getPoster())
-    //     //         .add("postDate", epochPostDate)
-    //     //         .add("categories", notice.getCategories())
-    //     //         .add("text", notice.getText())
-    //     //         .build().toString();
-	// }
+	}
 
 
 

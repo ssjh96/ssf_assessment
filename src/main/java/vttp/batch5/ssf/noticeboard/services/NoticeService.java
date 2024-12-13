@@ -1,16 +1,23 @@
 package vttp.batch5.ssf.noticeboard.services;
 
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
-import jakarta.json.JsonReader;
 import vttp.batch5.ssf.noticeboard.models.Notice;
+import vttp.batch5.ssf.noticeboard.repositories.NoticeRepository;
 
+@Service
 public class NoticeService {
 
 	// TODO: Task 3
@@ -20,19 +27,54 @@ public class NoticeService {
 	@Value("{${publishing.server.url}}")
 	private String publishingServerUrl;
 
-	public Map<String, Object> postToNoticeServer(Notice notice) 
+	@Autowired
+	private NoticeRepository noticeRepo;
+
+	public List<String> postToNoticeServer(Notice notice) 
 	{
-		// Parse in JSON payload
-		// Prepare read string as JSON; payload is a plain JSON string sent from postman
-		Map<String, Object> payload = new HashMap<>();
+		String url = publishingServerUrl + "/notice";
+		System.out.println(url);
 
-		payload.put("title", notice.getTitle());
-		payload.put("poster", notice.getPoster());
-		payload.put("postDate", notice.getPostDate());
+		List<String> respList = new ArrayList<>();
 		
+		JsonArrayBuilder jab = Json.createArrayBuilder();
+		
+		for (String c : notice.getCategories())
+		{
+			jab.add(c);
+		}
 
-		return null;
+		JsonArray jCategories = jab.build();
 
+		JsonObject jNotice = Json.createObjectBuilder()
+			.add("title", notice.getTitle())
+			.add("poster", notice.getPoster())
+			.add("postDate", notice.getPostDate().getTime())
+			.add("categories", jCategories)
+			.add("text", notice.getText())
+			.build();
 
+		RestTemplate restTemplate = new RestTemplate();
+
+		RequestEntity<String> req = RequestEntity.post(url).contentType(MediaType.APPLICATION_JSON).body(jNotice.toString());
+
+		try 
+		{
+			ResponseEntity<String> resp = restTemplate.exchange(req, String.class);
+
+			if (resp.getStatusCode().is2xxSuccessful())
+			{
+				respList.add(resp.getBody().toString());
+			}
+
+		} 
+		catch (Exception e) 
+		{
+			String error = e.getMessage();
+			respList.add(error);
+		}
+
+		System.out.println(respList);
+		return respList;
 	}
 }
